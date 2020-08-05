@@ -52,6 +52,11 @@ if ( ! file_exists( AMP_APP_SHELL__DIR__ . '/assets/js/amp-wp-app-shell.js' ) ) 
 	);
 }
 
+/**
+ * Checks if required plugins are active.
+ *
+ * @global WP_Error $_amp_app_shell_load_errors
+ */
 function _amp_app_shell_check_dependecies() {
 	global $_amp_app_shell_load_errors;
 
@@ -76,19 +81,28 @@ function _amp_app_shell_check_dependecies() {
 			)
 		);
 	}
-
-	// Abort if dependencies are not satisfied.
-	if ( ! empty( $_amp_app_shell_load_errors->errors ) ) {
-		add_action( 'admin_notices', '_amp_app_shell_show_load_errors_admin_notice' );
-	}
 }
 
 add_action( 'admin_init', '_amp_app_shell_check_dependecies' );
 
 /**
+ * Checks if there are any load errors and displays admin notice if yes.
+ *
+ * @global WP_Error $_amp_app_shell_load_errors
+ */
+function _amp_app_shell_maybe_show_error_notices() {
+	global $_amp_app_shell_load_errors;
+
+	if ( ! empty( $_amp_app_shell_load_errors->errors ) ) {
+		add_action( 'admin_notices', '_amp_app_shell_show_load_errors_admin_notice' );
+	}
+}
+
+add_action( 'admin_init', '_amp_app_shell_maybe_show_error_notices' );
+
+/**
  * Displays an admin notice about why the plugin is unable to load.
  *
- * @since 1.1.2
  * @global WP_Error $_amp_app_shell_load_errors
  */
 function _amp_app_shell_show_load_errors_admin_notice() {
@@ -113,8 +127,6 @@ function _amp_app_shell_show_load_errors_admin_notice() {
 
 /**
  * Print admin notice if plugin installed with incorrect slug (which impacts WordPress's auto-update system).
- *
- * @since 1.0
  */
 function _amp_app_shell_incorrect_plugin_slug_admin_notice() {
 	$actual_slug = basename( AMP_APP_SHELL__DIR__ );
