@@ -44,6 +44,11 @@ function amp_app_shell_init() {
 	 * Triggers on init when AMP App Shell plugin is active.
 	 */
 	do_action( 'amp_app_shell_init' );
+
+	add_filter( 'wp_redirect', [ 'AMP_App_Shell', 'purge_app_shell_query_var' ] );
+	AMP_App_Shell::purge_app_shell_query_var();
+
+	add_action( 'parse_query', [ 'AMP_App_Shell', 'init' ], 9 );
 }
 
 /**
@@ -146,10 +151,10 @@ function amp_start_app_shell_content() {
 		return;
 	}
 
-	printf( '<div id="%s">', esc_attr( AMP_Theme_Support::APP_SHELL_CONTENT_ELEMENT_ID ) );
+	printf( '<div id="%s">', esc_attr( AMP_App_Shell::CONTENT_ELEMENT_ID ) );
 
 	// Start output buffering if requesting outer shell, since all content will be omitted from the response.
-	if ( 'outer' === AMP_Theme_Support::get_requested_app_shell_component() ) {
+	if ( 'outer' === AMP_App_Shell::get_requested_app_shell_component() ) {
 		$content_placeholder = '<p>' . esc_html__( 'Loading&hellip;', 'amp-app-shell' ) . '</p>';
 
 		/**
@@ -182,9 +187,9 @@ function amp_end_app_shell_content() {
 	}
 
 	// Clean output buffer if requesting outer shell, since all content will be omitted from the response.
-	if ( 'outer' === AMP_Theme_Support::get_requested_app_shell_component() ) {
+	if ( 'outer' === AMP_App_Shell::get_requested_app_shell_component() ) {
 		ob_end_clean();
 	}
 
-	printf( '</div><!-- #%s -->', esc_attr( AMP_Theme_Support::APP_SHELL_CONTENT_ELEMENT_ID ) );
+	printf( '</div><!-- #%s -->', esc_attr( AMP_App_Shell::CONTENT_ELEMENT_ID ) );
 }
