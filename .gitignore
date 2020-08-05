@@ -1,0 +1,8 @@
+.DS_Store
+/vendor
+/build
+node_modules
+assets/js/**/*.js
+assets/js/*.asset.php
+assets/js/*.map
+.idea/

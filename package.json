@@ -1,0 +1,41 @@
+{
+  "name": "amp-app-shell",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Support for app shell navigation via AMP Shadow DOM.",
+  "scripts": {
+    "build": "npm-run-all build:*",
+    "build:js": "wp-scripts build assets/src/js/* --output-path=assets/js",
+    "lint": "npm-run-all lint:*",
+    "lint:js": "wp-scripts lint-js assets/src/js",
+    "lint:js:fix": "npm run lint:js -- --fix",
+    "lint:php": "vendor/bin/phpcs",
+    "lint:php:fix": "./bin/phpcbf.sh",
+    "start": "wp-scripts start assets/src/js/* --output-path=assets/js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xwp/amp-app-shell.git"
+  },
+  "keywords": [
+    "amp",
+    "amphtml",
+    "app-shell",
+    "shadow-dom",
+    "wordpress",
+    "wordpress-plugin"
+  ],
+  "author": "XWP, Google, and contributors",
+  "license": "GPL-2.0-or-later",
+  "bugs": {
+    "url": "https://github.com/xwp/amp-app-shell/issues"
+  },
+  "homepage": "https://github.com/xwp/amp-app-shell#readme",
+  "title": "AMP App Shell for WordPress",
+  "devDependencies": {
+    "@wordpress/hooks": "^2.9.0",
+    "@wordpress/scripts": "^12.1.1",
+    "npm-run-all": "^4.1.5"
+  }
+}
