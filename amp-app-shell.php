@@ -73,7 +73,7 @@ function _amp_app_shell_check_dependecies() {
 
 	if ( ! is_plugin_active( 'pwa/pwa.php' ) ) {
 		$_amp_app_shell_load_errors->add(
-			'amp_plugin_required',
+			'pwa_plugin_required',
 			sprintf(
 				/* translators: %s: <a href="https://wordpress.org/plugins/pwa/" target="_blank">PWA</a> */
 				__( 'It seems that %s plugin is not installed. Please install and activate the plugin to finish installation.', 'amp-app-shell' ), // phpcs:ignore WordPress.Security.EscapeOutput
