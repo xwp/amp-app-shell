@@ -35,6 +35,10 @@ class AMP_App_Shell {
 	 * Init app shell.
 	 */
 	public static function init() {
+		if ( ! class_exists( 'AMP_Theme_Support' ) ) {
+			return;
+		}
+
 		$theme_support = AMP_Theme_Support::get_theme_support_args();
 		if ( ! isset( $theme_support['app_shell'] ) ) {
 			return;
@@ -95,17 +99,21 @@ class AMP_App_Shell {
 
 	/**
 	 * Remove app shell query var that comes in requests.
+	 *
+	 * @param  string $location The path or URL to redirect to.
+	 * @return string Purged path or URL to redirect to.
 	 */
-	public static function purge_app_shell_query_var() {
+	public static function purge_app_shell_query_var( $location = '' ) {
 		if ( ! isset( $_GET[ self::COMPONENT_QUERY_VAR ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return;
+			return $location;
 		}
 
 		self::$app_shell_component = wp_unslash( $_GET[ self::COMPONENT_QUERY_VAR ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		unset( $_REQUEST[ self::COMPONENT_QUERY_VAR ], $_GET[ self::COMPONENT_QUERY_VAR ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$build_query = static function ( $query ) {
-			$pairs   = [];
+			$pairs = [];
+
 			foreach ( explode( '&', $query ) as $pair ) {
 				if ( false === strpos( $pair, self::COMPONENT_QUERY_VAR ) ) {
 					$pairs[] = $pair;
@@ -130,6 +138,8 @@ class AMP_App_Shell {
 				$_SERVER['REQUEST_URI'] .= "?{$pairs}";
 			}
 		}
+
+		return $location;
 	}
 
 	/**

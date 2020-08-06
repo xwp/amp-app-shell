@@ -45,7 +45,7 @@ function amp_app_shell_init() {
 	 */
 	do_action( 'amp_app_shell_init' );
 
-	add_filter( 'wp_redirect', [ 'AMP_App_Shell', 'purge_app_shell_query_var' ] );
+	add_filter( 'wp_redirect', [ 'AMP_App_Shell', 'purge_app_shell_query_var' ], 10, 1 );
 	AMP_App_Shell::purge_app_shell_query_var();
 
 	add_action( 'parse_query', [ 'AMP_App_Shell', 'init' ], 9 );
