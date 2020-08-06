@@ -33,8 +33,6 @@ class AMP_App_Shell {
 
 	/**
 	 * Init app shell.
-	 *
-	 * @since 1.1
 	 */
 	public static function init() {
 		$theme_support = AMP_Theme_Support::get_theme_support_args();
@@ -137,8 +135,6 @@ class AMP_App_Shell {
 	/**
 	 * Add purged query var to the supplied URL.
 	 *
-	 * @since 1.0
-	 *
 	 * @param string $url URL.
 	 * @return string URL with purged query var.
 	 */
@@ -149,7 +145,7 @@ class AMP_App_Shell {
 		return $url;
 	}
 
-		/**
+	/**
 	 * Get the requested app shell component (either inner or outer).
 	 *
 	 * @return string|null App shell component.
