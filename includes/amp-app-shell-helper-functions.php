@@ -16,8 +16,6 @@ function amp_app_shell_activate() {
 
 /**
  * Bootstrap plugin.
- *
- * @since 1.5
  */
 function amp_app_shell_bootstrap_plugin() {
 	/*
@@ -36,8 +34,6 @@ function amp_app_shell_bootstrap_plugin() {
 
 /**
  * Init AMP App Shell.
- *
- * @since 0.1
  */
 function amp_app_shell_init() {
 	/**
@@ -47,6 +43,8 @@ function amp_app_shell_init() {
 
 	add_filter( 'wp_redirect', [ 'AMP_App_Shell', 'purge_app_shell_query_var' ], 10, 1 );
 	AMP_App_Shell::purge_app_shell_query_var();
+
+	AMP_App_Shell_Service_Worker::init();
 
 	add_action( 'parse_query', [ 'AMP_App_Shell', 'init' ], 9 );
 }
@@ -142,7 +140,6 @@ function amp_app_shell_filter_script_loader_tag( $tag, $handle ) {
  *
  * Depends on adding app_shell to the amp theme support args.
  *
- * @since 1.1
  * @todo Should this take an argument for the content placeholder?
  */
 function amp_start_app_shell_content() {
@@ -177,8 +174,6 @@ function amp_start_app_shell_content() {
  * Mark the end of the content that will be displayed inside the app shell.
  *
  * Depends on adding app_shell to the amp theme support args.
- *
- * @since 1.1
  */
 function amp_end_app_shell_content() {
 	$support_args = AMP_Theme_Support::get_theme_support_args();

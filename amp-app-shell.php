@@ -153,6 +153,7 @@ if ( 'amp-app-shell' !== basename( AMP_APP_SHELL__DIR__ ) ) {
 }
 
 require_once AMP_APP_SHELL__DIR__ . '/includes/amp-app-shell-helper-functions.php';
+require_once AMP_APP_SHELL__DIR__ . '/includes/class-amp-app-shell-service-worker.php';
 require_once AMP_APP_SHELL__DIR__ . '/includes/class-amp-app-shell.php';
 
 register_activation_hook( __FILE__, 'amp_app_shell_activate' );
