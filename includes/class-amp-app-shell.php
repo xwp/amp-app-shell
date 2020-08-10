@@ -5,6 +5,8 @@
  * @package AmpAppShell
  */
 
+use AmpProject\Dom\Document;
+
 /**
  * Class AMP_App_Shell
  */
@@ -35,6 +37,17 @@ class AMP_App_Shell {
 	 * Init app shell.
 	 */
 	public static function init() {
+		add_action( 'parse_query', [ __CLASS__, 'init_app_shell' ], 9 );
+
+		if ( ! is_admin() ) {
+			add_action( 'template_redirect', [ __CLASS__, 'start_output_buffering' ] );
+		}
+	}
+
+	/**
+	 * Init app shell.
+	 */
+	public static function init_app_shell() {
 		if ( ! class_exists( 'AMP_Theme_Support' ) ) {
 			return;
 		}
@@ -175,5 +188,145 @@ class AMP_App_Shell {
 			return $component;
 		}
 		return null;
+	}
+
+
+	/**
+	 * Start output buffering.
+	 *
+	 * @see AMP_App_Shell::prepare_response()
+	 */
+	public static function start_output_buffering() {
+		ob_start( [ __CLASS__, 'prepare_response' ] );
+	}
+
+	/**
+	 * Finish output buffering and process response.
+	 *
+	 * @see AMP_App_Shell::start_output_buffering()
+	 *
+	 * @param string $response Buffered HTML document response. By default it expects a complete document.
+	 * @return string Processed Response.
+	 */
+	public static function prepare_response( $response ) {
+		$app_shell_component = self::get_requested_app_shell_component();
+
+		if ( ! class_exists( 'AmpProject\Dom\Document' ) || ! $app_shell_component ) {
+			return $response;
+		}
+
+		$dom             = Document::fromHtml( $response );
+		$content_element = $dom->getElementById( self::CONTENT_ELEMENT_ID );
+
+		if ( ! $content_element ) {
+			status_header( 500 );
+			return esc_html__( 'Unable to locate CONTENT_ELEMENT_ID.', 'amp-app-shell' );
+		}
+
+		// Remove the content wrappers if requesting the inner app shell.
+		if ( 'inner' === $app_shell_component ) {
+			self::prepare_inner_app_shell_document( $content_element );
+			return $dom->saveHTML();
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Prepare inner app shell.
+	 *
+	 * @param DOMElement $content_element Content element.
+	 */
+	protected static function prepare_inner_app_shell_document( DOMElement $content_element ) {
+		$dom = Document::fromNode( $content_element );
+
+		// Preserve the admin bar.
+		$admin_bar = $dom->getElementById( 'wpadminbar' );
+		if ( $admin_bar ) {
+			$admin_bar->parentNode->removeChild( $admin_bar );
+		}
+
+		// Extract all stylesheet elements before the body gets isolated.
+		$style_elements = [];
+		$lower_case     = 'translate( %s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz" )'; // In XPath 2.0 this is lower-case().
+		$predicates     = [
+			sprintf( '( self::style and ( not( @type ) or %s = "text/css" ) )', sprintf( $lower_case, '@type' ) ),
+			sprintf( '( self::link and @href and %s = "stylesheet" )', sprintf( $lower_case, '@rel' ) ),
+		];
+		foreach ( $dom->xpath->query( './/*[ ' . implode( ' or ', $predicates ) . ' ]', $dom->body ) as $element ) {
+			$style_elements[] = $element;
+		}
+		foreach ( $style_elements as $style_element ) {
+			$style_element->parentNode->removeChild( $style_element );
+		}
+
+		// Preserve all svg defs which aren't inside the content element.
+		$svgs_with_def = [];
+		foreach ( $dom->xpath->query( '//svg[.//defs]' ) as $svg ) {
+			$svgs_with_def[] = $svg;
+		}
+
+		// Isolate the content element from the rest of the elements in the body.
+		$remove_siblings = function( DOMElement $node ) {
+			while ( $node->previousSibling ) {
+				$node->parentNode->removeChild( $node->previousSibling );
+			}
+			while ( $node->nextSibling ) {
+				$node->parentNode->removeChild( $node->nextSibling );
+			}
+		};
+		$node            = $content_element;
+		do {
+			$remove_siblings( $node );
+			$node = $node->parentNode;
+		} while ( $node && $node !== $dom->body );
+
+		// Restore admin bar element.
+		if ( $admin_bar ) {
+			$dom->body->appendChild( $admin_bar );
+		}
+
+		// Restore style elements.
+		foreach ( $style_elements as $style_element ) {
+			$dom->body->appendChild( $style_element );
+		}
+
+		// Restore SVGs with defs.
+		foreach ( $svgs_with_def as $svg ) {
+			/*
+			 * Check if the node was removed from the document.
+			 * This is needed because Node.compareDocumentPosition() is not available in PHP.
+			 */
+			$is_connected = false;
+			$node         = $svg;
+			while ( $node->parentNode ) {
+				if ( $node === $svg->ownerDocument ) {
+					$is_connected = true;
+					break;
+				}
+				$node = $node->parentNode;
+			}
+
+			// Re-add the SVG element to the body with only its defs elements.
+			if ( ! $is_connected ) {
+				$defs = [];
+				foreach ( $svg->getElementsByTagName( 'defs' ) as $def ) {
+					$defs[] = $def;
+				}
+
+				// Remove all children.
+				while ( $svg->firstChild ) {
+					$svg->removeChild( $svg->firstChild );
+				}
+
+				// Re-add all defs.
+				foreach ( $defs as $def ) {
+					$svg->appendChild( $def );
+				}
+
+				// Add to body.
+				$dom->body->appendChild( $svg );
+			}
+		}
 	}
 }

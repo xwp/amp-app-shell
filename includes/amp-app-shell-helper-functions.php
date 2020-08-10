@@ -45,8 +45,7 @@ function amp_app_shell_init() {
 	AMP_App_Shell::purge_app_shell_query_var();
 
 	AMP_App_Shell_Service_Worker::init();
-
-	add_action( 'parse_query', [ 'AMP_App_Shell', 'init' ], 9 );
+	AMP_App_Shell::init();
 }
 
 /**
