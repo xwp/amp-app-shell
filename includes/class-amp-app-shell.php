@@ -40,7 +40,20 @@ class AMP_App_Shell {
 		add_action( 'parse_query', [ __CLASS__, 'init_app_shell' ], 9 );
 
 		if ( ! is_admin() ) {
+			/*
+			 * Start output buffering after AMP plugin has already started its own
+			 * buffering. Any changes done to the document in this app shell buffering
+			 * callback are later processed by the AMP plugin.
+			 */
 			add_action( 'template_redirect', [ __CLASS__, 'start_output_buffering' ] );
+
+			/*
+			 * Start late output buffering at very low priority so that it is run
+			 * before AMP plugin buffering starts. Thanks to that, the app shell
+			 * buffering callback function is executed after AMP plugin does its job.
+			 */
+			$priority = defined( 'PHP_INT_MIN' ) ? PHP_INT_MIN : ~PHP_INT_MAX; // phpcs:ignore PHPCompatibility.Constants.NewConstants.php_int_minFound
+			add_action( 'wp', [ __CLASS__, 'start_late_output_buffering' ], $priority );
 		}
 	}
 
@@ -190,28 +203,43 @@ class AMP_App_Shell {
 		return null;
 	}
 
-
 	/**
 	 * Start output buffering.
 	 *
 	 * @see AMP_App_Shell::prepare_response()
 	 */
 	public static function start_output_buffering() {
-		ob_start( [ __CLASS__, 'prepare_response' ] );
+		ob_start( function( $response ) {
+			return self::prepare_response( $response );
+		} );
+	}
+
+	/**
+	 * Start late output buffering.
+	 *
+	 * @see AMP_App_Shell::prepare_response()
+	 */
+	public static function start_late_output_buffering() {
+		ob_start( function( $response ) {
+			return self::prepare_response( $response, true );
+		} );
 	}
 
 	/**
 	 * Finish output buffering and process response.
 	 *
 	 * @see AMP_App_Shell::start_output_buffering()
+	 * @see AMP_App_Shell::start_late_output_buffering()
 	 *
 	 * @param string $response Buffered HTML document response. By default it expects a complete document.
+	 * @param bool   $is_late  Flag indicating that buffer contains late, already processed response.
 	 * @return string Processed Response.
 	 */
-	public static function prepare_response( $response ) {
+	public static function prepare_response( $response, $is_late = false ) {
 		$app_shell_component = self::get_requested_app_shell_component();
 
-		if ( ! class_exists( 'AmpProject\Dom\Document' ) || ! $app_shell_component ) {
+		// Remove the content wrappers if requesting the inner app shell.
+		if ( 'inner' !== $app_shell_component || ! class_exists( 'AmpProject\Dom\Document' ) ) {
 			return $response;
 		}
 
@@ -223,17 +251,17 @@ class AMP_App_Shell {
 			return esc_html__( 'Unable to locate CONTENT_ELEMENT_ID.', 'amp-app-shell' );
 		}
 
-		// Remove the content wrappers if requesting the inner app shell.
-		if ( 'inner' === $app_shell_component ) {
+		if ( $is_late ) {
+			self::sanitize_styles_for_shadow_dom( $dom );
+		} else {
 			self::prepare_inner_app_shell_document( $content_element );
-			return $dom->saveHTML();
 		}
 
-		return $response;
+		return $dom->saveHTML();
 	}
 
 	/**
-	 * Prepare inner app shell.
+	 * Prepare inner app shell by removing content wrappers.
 	 *
 	 * @param DOMElement $content_element Content element.
 	 */
@@ -275,7 +303,8 @@ class AMP_App_Shell {
 				$node->parentNode->removeChild( $node->nextSibling );
 			}
 		};
-		$node            = $content_element;
+
+		$node = $content_element;
 		do {
 			$remove_siblings( $node );
 			$node = $node->parentNode;
@@ -327,6 +356,28 @@ class AMP_App_Shell {
 				// Add to body.
 				$dom->body->appendChild( $svg );
 			}
+		}
+	}
+
+	/**
+	 * Sanitize styles specifically for using inside an app shell.
+	 *
+	 * @param Document $dom DOM tree.
+	 */
+	protected static function sanitize_styles_for_shadow_dom( Document $dom ) {
+		$lower_case = 'translate( %s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz" )'; // In XPath 2.0 this is lower-case().
+		$query = sprintf( '//*[ ( self::style and not( @amp-boilerplate ) and ( not( @type ) or %s = "text/css" ) ) ]', sprintf( $lower_case, '@type' ) );
+
+		foreach ( $dom->xpath->query( $query ) as $element ) {
+			/*
+			 * The :root pseudo selector does not work inside shadow DOM. Additionally,
+			 * the shadow DOM is not including the root html element (or the head element),
+			 * however there is a body element. The AMP plugin uses :root in the transformation
+			 * of !important rules to give selectors high specificity. Replacing :root with
+			 * body will not work all of the time.
+			 * @todo The use of :root pseudo selectors in stylesheets needs to be revisited in Shadow DOM.
+			 */
+			$element->nodeValue = preg_replace( '/:root\b/', 'body', $element->nodeValue );
 		}
 	}
 }
