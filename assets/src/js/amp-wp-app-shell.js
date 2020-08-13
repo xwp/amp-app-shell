@@ -140,9 +140,10 @@ function isHeaderVisible() {
  * @return {Promise<Response>} Response promise.
  */
 function fetchShadowDocResponse( url ) {
-	const { componentQueryVar } = ampAppShell;
+	const { ampSlug, componentQueryVar } = ampAppShell;
 	const componentUrl = new URL( url );
 	componentUrl.searchParams.set( componentQueryVar, 'inner' );
+	componentUrl.searchParams.set( ampSlug, 1 );
 
 	/**
 	 * Filters the inner component URL.
@@ -150,14 +151,12 @@ function fetchShadowDocResponse( url ) {
 	 * This filter is useful in case a format of the inner component URL has to
 	 * be changed.
 	 *
-	 * @param {string} componentUrl      Inner component URL.
-	 * @param {string} url               Document base URL.
+	 * @param {URL}    componentUrl      Inner component URL.
 	 * @param {string} componentQueryVar Component query parameter name.
 	 */
 	const ampUrl = ampAppShell.hooks.applyFilters(
 		'amp.appShell.innerComponentUrl',
 		componentUrl,
-		url,
 		componentQueryVar
 	);
 

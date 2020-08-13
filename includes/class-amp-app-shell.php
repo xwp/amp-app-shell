@@ -118,6 +118,7 @@ class AMP_App_Shell {
 						'contentElementId'  => self::CONTENT_ELEMENT_ID,
 						'homeUrl'           => home_url( '/' ),
 						'adminUrl'          => admin_url( '/' ),
+						'ampSlug'           => amp_get_slug(),
 						'componentQueryVar' => self::COMPONENT_QUERY_VAR,
 						'isOuterAppShell'   => 'outer' === $requested_app_shell_component,
 					];
