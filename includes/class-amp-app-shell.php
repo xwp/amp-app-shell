@@ -40,7 +40,7 @@ class AMP_App_Shell {
 		add_action( 'parse_query', [ __CLASS__, 'init_app_shell' ], 9 );
 
 		// Remove app shell query var.
-		add_filter( 'wp_redirect', [ __CLASS__, 'purge_app_shell_query_var' ], 10, 1 );
+		add_filter( 'wp_redirect', [ __CLASS__, 'add_purged_query_var' ], 10, 1 );
 		self::purge_app_shell_query_var();
 
 		if ( ! is_admin() ) {
