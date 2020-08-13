@@ -196,7 +196,7 @@ function loadUrl( url, { scrollIntoView = false, pushState = true } = {} ) {
 	updateNavMenuClasses( url );
 
 	fetchShadowDocResponse( url )
-		.then( ( response ) => {
+		.then( async ( response ) => {
 			if ( currentShadowDoc ) {
 				currentShadowDoc.close();
 			}
@@ -310,13 +310,12 @@ function loadUrl( url, { scrollIntoView = false, pushState = true } = {} ) {
 				}
 			} );
 
-			const reader = response.body.getReader();
-			const decoder = new TextDecoder();
+			if ( response.body ) {
+				const reader = response.body.getReader();
+				const decoder = new TextDecoder();
 
-			function readChunk() {
-				// @todo Get rid of the eslint disable rule
-				/* eslint-disable consistent-return */
-				return reader.read().then( ( chunk ) => {
+				while ( true ) {
+					const chunk = await reader.read();
 					const input = chunk.value || new Uint8Array();
 					const text = decoder.decode( input, {
 						stream: ! chunk.done,
@@ -326,14 +325,16 @@ function loadUrl( url, { scrollIntoView = false, pushState = true } = {} ) {
 					}
 					if ( chunk.done ) {
 						currentShadowDoc.writer.close();
-					} else {
-						return readChunk();
+						break;
 					}
+				}
+			} else {
+				// Fallback in case ReadableStream is not supported.
+				response.text().then( ( text ) => {
+					currentShadowDoc.writer.write( text );
+					currentShadowDoc.writer.close();
 				} );
-				/* eslint-enable consistent-return */
 			}
-
-			return readChunk();
 		} )
 		.catch( ( error ) => {
 			if ( 'amp_unavailable' === error ) {
