@@ -26,7 +26,7 @@ function amp_app_shell_bootstrap_plugin() {
 	 */
 	add_action( 'wp_default_scripts', 'amp_app_shell_register_default_scripts', PHP_INT_MAX );
 
-	add_action( 'init', 'amp_app_shell_init', 0 ); // Must be 0 because widgets_init happens at init priority 1.
+	add_action( 'amp_init', 'amp_app_shell_init' );
 
 	// Ensure async is present on script tags.
 	add_filter( 'script_loader_tag', 'amp_app_shell_filter_script_loader_tag', PHP_INT_MAX, 2 );
@@ -41,21 +41,8 @@ function amp_app_shell_init() {
 	 */
 	do_action( 'amp_app_shell_init' );
 
-	add_filter( 'wp_redirect', [ 'AMP_App_Shell', 'purge_app_shell_query_var' ], 10, 1 );
-	AMP_App_Shell::purge_app_shell_query_var();
-
 	AMP_App_Shell_Service_Worker::init();
 	AMP_App_Shell::init();
-}
-
-/**
- * Get AMP App Shell asset URL.
- *
- * @param string $file Relative path to file in assets directory.
- * @return string URL.
- */
-function amp_app_shell_get_asset_url( $file ) {
-	return plugins_url( sprintf( 'assets/%s', $file ), AMP_APP_SHELL__FILE__ );
 }
 
 /**
@@ -76,18 +63,14 @@ function amp_app_shell_register_default_scripts( $wp_scripts ) {
 
 	// App shell library.
 	$handle         = 'amp-wp-app-shell';
+	$url            = plugins_url( 'assets/js/' .$handle . '.js', AMP_APP_SHELL__FILE__ );
 	$asset_file     = AMP_APP_SHELL__DIR__ . '/assets/js/' . $handle . '.asset.php';
 	$asset          = require $asset_file;
 	$dependencies   = $asset['dependencies'];
 	$dependencies[] = 'amp-shadow';
 	$version        = $asset['version'];
 
-	$wp_scripts->add(
-		$handle,
-		amp_app_shell_get_asset_url( 'js/' . $handle . '.js' ),
-		$dependencies,
-		$version
-	);
+	$wp_scripts->add( $handle, $url, $dependencies, $version );
 
 	$wp_scripts->add_data(
 		$handle,
