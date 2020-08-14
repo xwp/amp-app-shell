@@ -63,7 +63,7 @@ function amp_app_shell_register_default_scripts( $wp_scripts ) {
 
 	// App shell library.
 	$handle         = 'amp-wp-app-shell';
-	$url            = plugins_url( 'assets/js/' .$handle . '.js', AMP_APP_SHELL__FILE__ );
+	$url            = plugins_url( 'assets/js/' . $handle . '.js', AMP_APP_SHELL__FILE__ );
 	$asset_file     = AMP_APP_SHELL__DIR__ . '/assets/js/' . $handle . '.asset.php';
 	$asset          = require $asset_file;
 	$dependencies   = $asset['dependencies'];

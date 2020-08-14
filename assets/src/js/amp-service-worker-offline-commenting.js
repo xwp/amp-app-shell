@@ -1,6 +1,9 @@
+/* eslint-env browser */
 /* global ERROR_MESSAGES, SITE_URL */
 {
-	const queue = new wp.serviceWorker.backgroundSync.Queue( 'amp-wpPendingComments' );
+	const queue = new wp.serviceWorker.backgroundSync.Queue(
+		'amp-wpPendingComments'
+	);
 	const errorMessages = ERROR_MESSAGES;
 
 	const commentHandler = ( { event } ) => {
@@ -14,15 +17,17 @@
 					credentials: event.request.credentials,
 					referrer: event.request.referrer,
 					redirect: 'follow',
-					body: body
+					body,
 				} );
 
 				// Add request to queue.
 				queue.pushRequest( {
-					request: queuedRequest
+					request: queuedRequest,
 				} );
 
-				const jsonBody = JSON.stringify( { message: errorMessages.comment } );
+				const jsonBody = JSON.stringify( {
+					message: errorMessages.comment,
+				} );
 				return new Response( jsonBody, {
 					status: 202,
 					statusText: 'Accepted',
@@ -30,10 +35,11 @@
 						'Access-Control-Allow-Origin': SITE_URL,
 						'Access-Control-Allow-Credentials': 'true',
 						'Content-Type': 'application/json; charset=UTF-8',
-						'Access-Control-Expose-Headers': 'AMP-Access-Control-Allow-Source-Origin',
+						'Access-Control-Expose-Headers':
+							'AMP-Access-Control-Allow-Source-Origin',
 						'AMP-Access-Control-Allow-Source-Origin': SITE_URL,
-						'Cache-Control': 'no-cache, must-revalidate, max-age=0'
-					}
+						'Cache-Control': 'no-cache, must-revalidate, max-age=0',
+					},
 				} );
 			} );
 		} );

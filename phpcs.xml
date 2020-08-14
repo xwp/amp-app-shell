@@ -28,6 +28,19 @@
 		</properties>
 	</rule>
 
+	<rule ref="WordPress.NamingConventions.ValidVariableName">
+		<properties>
+			<property name="customPropertiesWhitelist" type="array">
+				<element value="parentNode"/>
+				<element value="nextSibling"/>
+				<element value="previousSibling"/>
+				<element value="firstChild"/>
+				<element value="nodeValue"/>
+				<element value="ownerDocument"/>
+			</property>
+		</properties>
+	</rule>
+
 	<config name="testVersion" value="5.6-"/>
 	<rule ref="PHPCompatibilityWP"/>
 

@@ -227,7 +227,6 @@ function loadUrl( url, { scrollIntoView = false, pushState = true } = {} ) {
 			currentShadowDoc.ampdoc.whenReady().then( () => {
 				const currentUrl = new URL( url );
 
-
 				// Update the nav menu classes if the final URL has redirected somewhere else.
 				if ( currentUrl.toString() !== url.toString() ) {
 					updateNavMenuClasses( currentUrl );

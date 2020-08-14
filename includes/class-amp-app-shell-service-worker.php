@@ -72,7 +72,7 @@ class AMP_App_Shell_Service_Worker {
 			function( $supportable_templates ) {
 				if ( ! isset( $supportable_templates['is_offline'] ) ) {
 					$supportable_templates['is_offline'] = [
-						'label' => __( 'Offline', 'amp' ),
+						'label' => __( 'Offline', 'amp-app-shell' ),
 					];
 				}
 				return $supportable_templates;
@@ -106,7 +106,7 @@ class AMP_App_Shell_Service_Worker {
 	 */
 	public static function add_live_list_offline_commenting( $service_workers ) {
 		if ( ! ( $service_workers instanceof WP_Service_Worker_Scripts ) ) {
-			_doing_it_wrong( __METHOD__, esc_html__( 'Expected argument to be WP_Service_Worker_Scripts.', 'amp' ), '1.0' );
+			_doing_it_wrong( __METHOD__, esc_html__( 'Expected argument to be WP_Service_Worker_Scripts.', 'amp-app-shell' ), '0.1' );
 			return;
 		}
 

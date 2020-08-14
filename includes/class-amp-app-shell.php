@@ -214,9 +214,11 @@ class AMP_App_Shell {
 	 * @see AMP_App_Shell::prepare_response()
 	 */
 	public static function start_output_buffering() {
-		ob_start( function( $response ) {
-			return self::prepare_response( $response );
-		} );
+		ob_start(
+			function( $response ) {
+				return self::prepare_response( $response );
+			}
+		);
 	}
 
 	/**
@@ -225,9 +227,11 @@ class AMP_App_Shell {
 	 * @see AMP_App_Shell::prepare_response()
 	 */
 	public static function start_late_output_buffering() {
-		ob_start( function( $response ) {
-			return self::prepare_response( $response, true );
-		} );
+		ob_start(
+			function( $response ) {
+				return self::prepare_response( $response, true );
+			}
+		);
 	}
 
 	/**
@@ -371,7 +375,7 @@ class AMP_App_Shell {
 	 */
 	protected static function sanitize_styles_for_shadow_dom( Document $dom ) {
 		$lower_case = 'translate( %s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz" )'; // In XPath 2.0 this is lower-case().
-		$query = sprintf( '//*[ ( self::style and not( @amp-boilerplate ) and ( not( @type ) or %s = "text/css" ) ) ]', sprintf( $lower_case, '@type' ) );
+		$query      = sprintf( '//*[ ( self::style and not( @amp-boilerplate ) and ( not( @type ) or %s = "text/css" ) ) ]', sprintf( $lower_case, '@type' ) );
 
 		foreach ( $dom->xpath->query( $query ) as $element ) {
 			/*
