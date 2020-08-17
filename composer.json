@@ -14,5 +14,8 @@
     "xwp/wp-dev-lib": "1.6.4"
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "post-install-cmd": "npm install && npm run build"
+  }
 }
