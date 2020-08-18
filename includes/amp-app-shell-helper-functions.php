@@ -55,6 +55,15 @@ function is_amp_app_shell_supported() {
 }
 
 /**
+ * Get the requested app shell component name.
+ *
+ * @return string|null Inner or outer shell, or null otherwise.
+ */
+function get_amp_app_shell_requested_component() {
+	return AMP_App_Shell::get_requested_app_shell_component();
+}
+
+/**
  * Register default scripts for AMP App Shell components.
  *
  * @param WP_Scripts $wp_scripts Scripts.
