@@ -65,12 +65,7 @@ class AMP_App_Shell {
 	 * Init app shell.
 	 */
 	public static function init_app_shell() {
-		if ( ! class_exists( 'AMP_Theme_Support' ) ) {
-			return;
-		}
-
-		$theme_support = AMP_Theme_Support::get_theme_support_args();
-		if ( ! isset( $theme_support['app_shell'] ) ) {
+		if ( ! is_amp_app_shell_supported() ) {
 			return;
 		}
 
@@ -192,12 +187,7 @@ class AMP_App_Shell {
 	 * @return string|null App shell component.
 	 */
 	public static function get_requested_app_shell_component() {
-		if ( empty( self::$app_shell_component ) ) {
-			return null;
-		}
-
-		$theme_support_args = AMP_Theme_Support::get_theme_support_args();
-		if ( ! isset( $theme_support_args['app_shell'] ) ) {
+		if ( empty( self::$app_shell_component ) || ! is_amp_app_shell_supported() ) {
 			return null;
 		}
 

@@ -23,7 +23,7 @@ class AMP_App_Shell_Service_Worker {
 			return;
 		}
 
-		if ( ! isset( $theme_support['app_shell'] ) ) {
+		if ( ! is_amp_app_shell_supported() ) {
 			return;
 		}
 

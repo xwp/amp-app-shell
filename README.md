@@ -28,12 +28,15 @@ For a theme to support app shell via the AMP plugin, the bare minimum that needs
 ```
 4. Opt-in to AMP theme support for app shell by adding the following to your `functions.php`:
 ```php
+add_theme_support( 'amp_app_shell' );
+```
+5. Ensure the theme uses the Transitional mode, i.e.:
+```php
 add_theme_support( 'amp', array(
     'paired' => true,
-    'app_shell' => true,
 ) );
 ```
-5. You should define an `offline.php` template in your theme.
+6. You should define an `offline.php` template in your theme.
 
 For theme which adds support for AMP app shell see https://github.com/xwp/twentyseventeen-westonson. Note that this theme copies some code from the Twenty Seventeen parent theme in order to add make the necessary modifications. For example, the `js/global.js` file modified as per [this diff](https://gist.github.com/westonruter/b9d7952c0879ea3cda9e0081e387846d). The theme has app shell behind a theme mod flag, so make sure you do `wp theme mod set service_worker_navigation amp_app_shell` via WP-CLI. See also how it [adds skeleton content](https://github.com/xwp/twentyseventeen-westonson/blob/03934b7328f9b18dd979ae97458ad38feb6f0e1a/functions.php#L241-L283) to the app shell. See also plugin to [enable stale-while-revalidate caching strategy for navigation requests](https://gist.github.com/westonruter/f848013108672568be6dcde153f9ca37).
 

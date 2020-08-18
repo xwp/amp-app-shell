@@ -46,6 +46,15 @@ function amp_app_shell_init() {
 }
 
 /**
+ * Check if AMP App Shell is supported by a theme.
+ *
+ * @return bool True if app shell is supported by a theme.
+ */
+function is_amp_app_shell_supported() {
+	return function_exists( 'current_theme_supports' ) && current_theme_supports( 'amp_app_shell' );
+}
+
+/**
  * Register default scripts for AMP App Shell components.
  *
  * @param WP_Scripts $wp_scripts Scripts.
@@ -125,8 +134,7 @@ function amp_app_shell_filter_script_loader_tag( $tag, $handle ) {
  * @todo Should this take an argument for the content placeholder?
  */
 function amp_start_app_shell_content() {
-	$support_args = AMP_Theme_Support::get_theme_support_args();
-	if ( ! isset( $support_args['app_shell'] ) ) {
+	if ( ! is_amp_app_shell_supported() ) {
 		return;
 	}
 
@@ -158,8 +166,7 @@ function amp_start_app_shell_content() {
  * Depends on adding app_shell to the amp theme support args.
  */
 function amp_end_app_shell_content() {
-	$support_args = AMP_Theme_Support::get_theme_support_args();
-	if ( ! isset( $support_args['app_shell'] ) ) {
+	if ( ! is_amp_app_shell_supported() ) {
 		return;
 	}
 
