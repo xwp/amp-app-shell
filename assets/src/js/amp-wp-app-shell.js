@@ -145,6 +145,9 @@ function fetchShadowDocResponse( url ) {
 	componentUrl.searchParams.set( componentQueryVar, 'inner' );
 	componentUrl.searchParams.set( ampSlug, 1 );
 
+	// Clean up the query parameters in order to prevent issues when fetching an inner component.
+	componentUrl.search = componentUrl.search.replace( '=&', '&' );
+
 	/**
 	 * Filters the inner component URL.
 	 *
