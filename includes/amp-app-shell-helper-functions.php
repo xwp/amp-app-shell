@@ -94,7 +94,7 @@ function amp_app_shell_register_default_scripts( $wp_scripts ) {
 		$handle,
 		'amp_script_attributes',
 		[
-			'async' => true,
+			'defer' => true,
 		]
 	);
 }
