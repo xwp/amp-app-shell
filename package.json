@@ -34,7 +34,7 @@
   "homepage": "https://github.com/xwp/amp-app-shell#readme",
   "title": "AMP App Shell for WordPress",
   "devDependencies": {
-    "@wordpress/hooks": "^2.9.0",
+    "@wordpress/hooks": "^2.10.0",
     "@wordpress/scripts": "^12.1.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5"
