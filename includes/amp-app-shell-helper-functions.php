@@ -74,7 +74,7 @@ function amp_app_shell_register_default_scripts( $wp_scripts ) {
 		'amp-shadow',
 		sprintf(
 			'if ( ! Element.prototype.attachShadow ) { const script = document.createElement( "script" ); script.src = %s; script.async = true; document.head.appendChild( script ); }',
-			wp_json_encode( 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.4.1/webcomponents-bundle.js' )
+			wp_json_encode( 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.4.4/webcomponents-bundle.js' )
 		),
 		'after'
 	);
@@ -94,7 +94,7 @@ function amp_app_shell_register_default_scripts( $wp_scripts ) {
 		$handle,
 		'amp_script_attributes',
 		[
-			'async' => true,
+			'defer' => true,
 		]
 	);
 }
