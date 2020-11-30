@@ -165,6 +165,13 @@ class AMP_App_Shell {
 			}
 		}
 
+		// Force AMP in case of app shell inner component.
+		if ( 'inner' === self::get_requested_app_shell_component() && function_exists( 'amp_get_slug' ) ) {
+			$_GET[ amp_get_slug() ]  = 1;
+			$_SERVER['QUERY_STRING'] = add_query_arg( amp_get_slug(), 1, $_SERVER['QUERY_STRING'] );
+			$_SERVER['REQUEST_URI']  = add_query_arg( amp_get_slug(), 1, $_SERVER['REQUEST_URI'] );
+		}
+
 		return $location;
 	}
 
