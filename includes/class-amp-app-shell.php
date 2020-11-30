@@ -76,7 +76,7 @@ class AMP_App_Shell {
 			add_action(
 				'template_redirect',
 				function() {
-					if ( ! is_amp_endpoint() ) {
+					if ( ! amp_is_request() ) {
 						return;
 					}
 					wp_die(
@@ -103,7 +103,7 @@ class AMP_App_Shell {
 			add_action(
 				'wp_enqueue_scripts',
 				function() use ( $requested_app_shell_component ) {
-					if ( is_amp_endpoint() ) {
+					if ( amp_is_request() ) {
 						return;
 					}
 					wp_enqueue_script( 'amp-shadow' );
