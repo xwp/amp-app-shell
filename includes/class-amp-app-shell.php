@@ -76,7 +76,7 @@ class AMP_App_Shell {
 			add_action(
 				'template_redirect',
 				function() {
-					if ( ! is_amp_endpoint() ) {
+					if ( ! amp_is_request() ) {
 						return;
 					}
 					wp_die(
@@ -103,7 +103,7 @@ class AMP_App_Shell {
 			add_action(
 				'wp_enqueue_scripts',
 				function() use ( $requested_app_shell_component ) {
-					if ( is_amp_endpoint() ) {
+					if ( amp_is_request() ) {
 						return;
 					}
 					wp_enqueue_script( 'amp-shadow' );
@@ -165,6 +165,13 @@ class AMP_App_Shell {
 			}
 		}
 
+		// Force AMP in case of app shell inner component.
+		if ( 'inner' === self::get_requested_app_shell_component() && function_exists( 'amp_get_slug' ) ) {
+			$_GET[ amp_get_slug() ]  = 1;
+			$_SERVER['QUERY_STRING'] = add_query_arg( amp_get_slug(), 1, $_SERVER['QUERY_STRING'] );
+			$_SERVER['REQUEST_URI']  = add_query_arg( amp_get_slug(), 1, $_SERVER['REQUEST_URI'] );
+		}
+
 		return $location;
 	}
 
@@ -175,9 +182,12 @@ class AMP_App_Shell {
 	 * @return string URL with purged query var.
 	 */
 	public static function add_purged_query_var( $url ) {
-		if ( ! empty( self::$app_shell_component ) ) {
-			$url = add_query_arg( self::COMPONENT_QUERY_VAR, self::$app_shell_component, $url );
+		$requested_app_shell_component = self::get_requested_app_shell_component();
+
+		if ( ! empty( $requested_app_shell_component ) ) {
+			$url = add_query_arg( self::COMPONENT_QUERY_VAR, $requested_app_shell_component, $url );
 		}
+
 		return $url;
 	}
 
@@ -195,6 +205,7 @@ class AMP_App_Shell {
 		if ( in_array( $component, [ 'inner', 'outer' ], true ) ) {
 			return $component;
 		}
+
 		return null;
 	}
 
