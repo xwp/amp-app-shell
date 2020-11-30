@@ -182,9 +182,12 @@ class AMP_App_Shell {
 	 * @return string URL with purged query var.
 	 */
 	public static function add_purged_query_var( $url ) {
-		if ( ! empty( self::$app_shell_component ) ) {
-			$url = add_query_arg( self::COMPONENT_QUERY_VAR, self::$app_shell_component, $url );
+		$requested_app_shell_component = self::get_requested_app_shell_component();
+
+		if ( ! empty( $requested_app_shell_component ) ) {
+			$url = add_query_arg( self::COMPONENT_QUERY_VAR, $requested_app_shell_component, $url );
 		}
+
 		return $url;
 	}
 
@@ -202,6 +205,7 @@ class AMP_App_Shell {
 		if ( in_array( $component, [ 'inner', 'outer' ], true ) ) {
 			return $component;
 		}
+
 		return null;
 	}
 
