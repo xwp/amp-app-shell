@@ -98,29 +98,33 @@ class AMP_App_Shell {
 			);
 		}
 
-		// Enqueue scripts for (outer) app shell, including precached app shell and normal site navigation prior to service worker installation.
-		if ( 'inner' !== $requested_app_shell_component ) {
-			add_action(
-				'wp_enqueue_scripts',
-				function() use ( $requested_app_shell_component ) {
-					if ( amp_is_request() ) {
-						return;
-					}
-					wp_enqueue_script( 'amp-shadow' );
-					wp_enqueue_script( 'amp-wp-app-shell' );
+		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_scripts' ] );
+	}
 
-					$exports = [
-						'contentElementId'  => self::CONTENT_ELEMENT_ID,
-						'homeUrl'           => home_url( '/' ),
-						'adminUrl'          => admin_url( '/' ),
-						'ampSlug'           => amp_get_slug(),
-						'componentQueryVar' => self::COMPONENT_QUERY_VAR,
-						'isOuterAppShell'   => 'outer' === $requested_app_shell_component,
-					];
-					wp_add_inline_script( 'amp-wp-app-shell', sprintf( 'var ampAppShell = %s;', wp_json_encode( $exports ) ), 'before' );
-				}
-			);
+	/**
+	 * Enqueue scripts for outer app shell.
+	 *
+	 * This includes precached app shell and normal site navigation prior to service worker installation.
+	 */
+	public static function enqueue_scripts() {
+		$requested_app_shell_component = self::get_requested_app_shell_component();
+		if ( amp_is_request() || 'inner' === $requested_app_shell_component ) {
+			return;
 		}
+
+		wp_enqueue_script( 'amp-shadow' );
+		wp_enqueue_script( 'amp-wp-app-shell' );
+
+		$exports = [
+			'contentElementId'  => self::CONTENT_ELEMENT_ID,
+			'homeUrl'           => home_url( '/' ),
+			'adminUrl'          => admin_url( '/' ),
+			'ampSlug'           => amp_get_slug(),
+			'componentQueryVar' => self::COMPONENT_QUERY_VAR,
+			'isOuterAppShell'   => true,
+		];
+
+		wp_add_inline_script( 'amp-wp-app-shell', sprintf( 'var ampAppShell = %s;', wp_json_encode( $exports ) ), 'before' );
 	}
 
 	/**
