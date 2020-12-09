@@ -1,7 +1,7 @@
 {
   "name": "amp-app-shell",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Support for app shell navigation via AMP Shadow DOM.",
   "scripts": {
     "build": "npm-run-all build:*",

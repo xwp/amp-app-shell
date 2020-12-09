@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/xwp/amp-app-shell/
  * Author: AMP Project Contributors, XWP
  * Author URI: https://github.com/xwp/amp-app-shell/graphs/contributors
- * Version: 0.1.5
+ * Version: 0.1.6
  * Text Domain: amp-app-shell
  * Domain Path: /languages/
  * License: GPLv2 or later
@@ -17,7 +17,7 @@
 
 define( 'AMP_APP_SHELL__FILE__', __FILE__ );
 define( 'AMP_APP_SHELL__DIR__', dirname( __FILE__ ) );
-define( 'AMP_APP_SHELL__VERSION', '0.1.5' );
+define( 'AMP_APP_SHELL__VERSION', '0.1.6' );
 
 /**
  * Errors encountered while loading the plugin.
